@@ -139,7 +139,7 @@ const SellProduct = () => {
         });
         setImageFiles([]);
         setImagePreviews([]);
-        navigate("/dashboard");
+        navigate("/userDashboard");
       }, 1000);
     } catch (error) {
       setIsSubmitting(false);

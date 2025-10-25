@@ -1,11 +1,13 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 
+  let BASE_URL = "https://olx-clone-backend-new.vercel.app/"
+
 export const registerUser = createAsyncThunk(
   "registerUser",
   async (data, { rejectWithValue }) => {
     try {
       console.log(data);
-      const response = await fetch("http://localhost:3000/register", {
+      const response = await fetch(`${BASE_URL}/register`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -28,7 +30,7 @@ export const loginUser = createAsyncThunk(
   "loginUser",
   async (data, { rejectWithValue }) => {
     try {
-      const response = await fetch("http://localhost:3000/login", {
+      const response = await fetch(`${BASE_URL}/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -54,7 +56,7 @@ export const getCurrentUser = createAsyncThunk(
   "user/getCurrentUser",
   async (_, { rejectWithValue }) => {
     try {
-      const response = await fetch("http://localhost:3000/auth/me", {
+      const response = await fetch(`${BASE_URL}/auth/me`, {
         method: "GET",
         credentials: "include",
       });

@@ -3,6 +3,7 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 export const getMyProducts = createAsyncThunk(
   "getMyProducts",
   async (data, { rejectWithValue }) => {
+    const BASE_URL = "https://olx-clone-backend-new.vercel.app/"
     try {
       const response = await fetch("http://localhost:3000/user/myProducts", {
         credentials: "include",
