@@ -31,7 +31,7 @@ export const getAllProducts = createAsyncThunk(
   "getAllProducts",
   async (data, { rejectWithValue }) => {
     try {
-      const response = await fetch(`${BASE_URL}/admin/products`, {
+      const response = await fetch(`${BASE_URL}/allProducts`, {
         credentials: "include",
         headers: {
           "Content-Type": "application/json",
