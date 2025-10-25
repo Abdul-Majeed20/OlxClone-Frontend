@@ -1,6 +1,6 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 
-  let BASE_URL = "https://olx-clone-backend-new.vercel.app/"
+  let BASE_URL = "https://olx-clone-backend-new.vercel.app"
 
 export const registerUser = createAsyncThunk(
   "registerUser",
@@ -77,7 +77,7 @@ export const getAllUsers = createAsyncThunk(
   "users/getAllUsers",
   async (_, { rejectWithValue }) => {
     try {
-      const response = await fetch("http://localhost:3000/admin/allUsers", {
+      const response = await fetch(`${BASE_URL}/admin/allUsers`, {
         method: "GET",
         credentials: "include",
       });
@@ -100,7 +100,7 @@ export const logoutUser = createAsyncThunk(
   "user/logout",
   async (_, { rejectWithValue }) => {
     try {
-      const response = await fetch("http://localhost:3000/logout", {
+      const response = await fetch(`${BASE_URL}/logout`, {
         method: "POST",
         credentials: "include", // Important to include cookies
       });
