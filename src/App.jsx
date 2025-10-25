@@ -10,7 +10,7 @@ import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 import Home from "./app/Home";
 import Product from "./app/Product";
 import AdminDashboard from "./app/AdminDashboard";
-import Unauthorized from "./components/unauthorized";
+import Unauthorized from "./components/Unauthorized";
 
 function App() {
   return (
