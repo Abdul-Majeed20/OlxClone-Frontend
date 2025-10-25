@@ -1,11 +1,12 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 
+let BASE_URL = "https://olx-clone-backend-new.vercel.app"
+
 export const getMyProducts = createAsyncThunk(
   "getMyProducts",
   async (data, { rejectWithValue }) => {
-    const BASE_URL = "https://olx-clone-backend-new.vercel.app/"
     try {
-      const response = await fetch("http://localhost:3000/user/myProducts", {
+      const response = await fetch(`${BASE_URL}/user/myProducts`, {
         credentials: "include",
         headers: {
           "Content-Type": "application/json",
@@ -30,7 +31,7 @@ export const getAllProducts = createAsyncThunk(
   "getAllProducts",
   async (data, { rejectWithValue }) => {
     try {
-      const response = await fetch("http://localhost:3000/admin/products", {
+      const response = await fetch(`${BASE_URL}/admin/products`, {
         credentials: "include",
         headers: {
           "Content-Type": "application/json",
@@ -56,7 +57,7 @@ export const getProductDetails = createAsyncThunk(
   async (id, { rejectWithValue }) => {
     try {
       const response = await fetch(
-        `http://localhost:3000/productDetails/${id}`,
+        `${BASE_URL}/productDetails/${id}`,
         {
           credentials: "include",
           headers: {
@@ -84,7 +85,7 @@ export const addProduct = createAsyncThunk(
   "addProduct",
   async (data, { rejectWithValue }) => {
     try {
-      const response = await fetch("http://localhost:3000/user/addProduct", {
+      const response = await fetch(`${BASE_URL}/user/addProduct`, {
         method: "POST",
         body: data, // ✅ Just pass FormData directly
         credentials: "include",
@@ -107,7 +108,7 @@ export const addToFavorites = createAsyncThunk(
   async (ProductId, { rejectWithValue }) => {
     try {
       const response = await fetch(
-        `http://localhost:3000/user/favourite/${ProductId}`,
+        `${BASE_URL}/user/favourite/${ProductId}`,
         {
           method: "POST",
           credentials: "include",
@@ -134,7 +135,7 @@ export const getFavourites = createAsyncThunk(
   "getFavourites",
   async (data, { rejectWithValue }) => {
     try {
-      const response = await fetch("http://localhost:3000/user/favourite", {
+      const response = await fetch(`${BASE_URL}/user/favourite`, {
         credentials: "include",
         headers: {
           "Content-Type": "application/json",
@@ -160,7 +161,7 @@ export const addToCart = createAsyncThunk(
   "addToCart",
   async (id, { rejectWithValue }) => {
     try {
-      const response = await fetch("http://localhost:3000/user/addToCart", {
+      const response = await fetch(`${BASE_URL}/user/addToCart`, {
         method: "POST",
         credentials: "include",
         headers: {
@@ -188,7 +189,7 @@ export const getCartItems = createAsyncThunk(
   "cart/getCartItems",
   async (_, { rejectWithValue }) => {
     try {
-      const response = await fetch("http://localhost:3000/user/cartItems", {
+      const response = await fetch(`${BASE_URL}/user/cartItems`, {
         method: "GET",
         credentials: "include",
       });
@@ -209,7 +210,7 @@ export const addOrder = createAsyncThunk(
   "product/addOrder",
   async (orderData, { rejectWithValue }) => {
     try {
-      const res = await fetch("http://localhost:3000/user/addOrder", {
+      const res = await fetch(`${BASE_URL}/user/addOrder`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(orderData),
@@ -229,7 +230,7 @@ export const getMyOrders = createAsyncThunk(
   "getMyOrders",
   async (_, { rejectWithValue }) => {
     try {
-      const response = await fetch("http://localhost:3000/user/myOrders", {
+      const response = await fetch(`${BASE_URL}user/myOrders`, {
         credentials: "include",
       });
       if (!response.ok) {
@@ -247,7 +248,7 @@ export const getAllOrders = createAsyncThunk(
   "getAllOrders ",
   async (_, { rejectWithValue }) => {
     try {
-      const response = await fetch("http://localhost:3000/admin/allOrders", {
+      const response = await fetch(`${BASE_URL}/admin/allOrders`, {
         credentials: "include",
       });
       if (!response.ok) {
@@ -267,7 +268,7 @@ export const updateOrder = createAsyncThunk(
     console.log("Order Id in action ",orderId , "new Status in action" , newStatus)
     try {
       const response = await fetch(
-        `http://localhost:3000/admin/updateOrder/${orderId}`,
+        `${BASE_URL}/admin/updateOrder/${orderId}`,
         {
           method: "PUT",
           credentials: "include",
@@ -294,7 +295,7 @@ export const getUserProfile = createAsyncThunk(
   "getUserProfile",
   async (_, { rejectWithValue }) => {
     try {
-      const response = await fetch("http://localhost:3000/user/profile", {
+      const response = await fetch(`${BASE_URL}/user/profile`, {
         credentials: "include",
       });
       if (!response.ok) {
