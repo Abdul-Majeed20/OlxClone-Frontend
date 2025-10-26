@@ -18,34 +18,33 @@ function Login() {
   // Move console.log outside of render to avoid excessive logging
   console.log("User state:", user);
 
-const handleSubmit = async (e) => {
-  e.preventDefault();
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-  const response = await dispatch(loginUser(formData));
+    const response = await dispatch(loginUser(formData));
 
-  // Case 1: Thunk fulfilled but backend says "login failed"
-  if (response.type === "loginUser/fulfilled" && response.payload?.success) {
+    // Case 1: Thunk fulfilled but backend says "login failed"
+    if (response.type === "loginUser/fulfilled" && response.payload?.success) {
+      const userRole =
+        response.payload?.data?.role || response.payload?.role || "user";
 
-    const userRole = response.payload?.data?.role || response.payload?.role || 'user';
-    
-     if (userRole === 'admin') {
-      toast.success("Welcome Admin! Redirecting to dashboard...");
-      navigate("/adminDashboard");
-    } else {
-      toast.success("Login successful! Redirecting...");
-      navigate("/userDashboard");
+      if (userRole === "admin") {
+        toast.success("Welcome Admin! Redirecting to dashboard...");
+        navigate("/adminDashboard");
+      } else {
+        toast.success("Login successful! Redirecting...");
+        navigate("/userDashboard");
+      }
     }
-  } 
-  // Case 2: Backend rejected or invalid credentials
-  else {
-    const errorMsg =
-      response.payload?.message ||
-      response.error?.message ||
-      "Invalid email or password";
-    toast.error(errorMsg);
-  }
-};
-
+    // Case 2: Backend rejected or invalid credentials
+    else {
+      const errorMsg =
+        response.payload?.message ||
+        response.error?.message ||
+        "Invalid email or password";
+      toast.error(errorMsg);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 relative overflow-hidden py-5">
@@ -60,9 +59,11 @@ const handleSubmit = async (e) => {
           <div className="max-w-lg mx-auto">
             {/* Logo */}
             <div className="flex items-center mb-8">
-              <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
-                <span className="text-white font-bold text-xl">OLX</span>
-              </div>
+              <Link to="/">
+                <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
+                  <span className="text-white font-bold text-xl">OLX</span>
+                </div>
+              </Link>
               <span className="ml-3 text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
                 Marketplace
               </span>
@@ -291,19 +292,19 @@ const handleSubmit = async (e) => {
           </div>
         </div>
       </div>
-       {/* Toast Container */}
-            <ToastContainer
-              position="top-right"
-              autoClose={5000}
-              hideProgressBar={false}
-              newestOnTop={false}
-              closeOnClick
-              rtl={false}
-              pauseOnFocusLoss
-              draggable
-              pauseOnHover
-              theme="light"
-            />
+      {/* Toast Container */}
+      <ToastContainer
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+      />
     </div>
   );
 }
