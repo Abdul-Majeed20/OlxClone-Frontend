@@ -74,7 +74,7 @@ const ProductCart = () => {
         productId: selectedProduct._id,
         quantity: parseInt(quantity),
       };
-    console.log("Order Data:", orderData);
+      console.log("Order Data:", orderData);
       const response = await dispatch(addOrder(orderData));
 
       if (response?.meta?.requestStatus === "fulfilled") {
@@ -124,12 +124,7 @@ const ProductCart = () => {
         ) : (
           cartItems.map((item) => {
             // Support both new `images` array and old `image` field
-            const src =
-              (Array.isArray(item.images) &&
-                item.images.length > 0 &&
-                item.images[0]) ||
-              item.image ||
-              placeholderImage;
+            const src = item?.images?.[0] || item?.image || placeholderImage;
 
             return (
               <div

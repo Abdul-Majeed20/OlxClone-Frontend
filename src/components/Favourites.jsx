@@ -33,7 +33,7 @@ export default function MyProducts() {
             >
               <div className="relative">
                 <img
-                  src={item.image}
+                  src={item.images[0]}
                   alt={item.title}
                   className="w-full h-56 object-cover rounded-t-2xl"
                 />

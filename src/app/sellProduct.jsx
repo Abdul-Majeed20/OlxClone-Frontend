@@ -15,16 +15,59 @@ const SellProduct = () => {
     description: "",
     location: "",
     condition: "Used",
+    stock: "",
   });
 
   const [imageFiles, setImageFiles] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [imagePreviews, setImagePreviews] = useState([]);
+  const [errors, setErrors] = useState({});
 
   // Handle text input changes
   const handleChange = (e) => {
     const { name, value } = e.target;
     setProductData((prev) => ({ ...prev, [name]: value }));
+    
+    // Clear error when user starts typing
+    if (errors[name]) {
+      setErrors(prev => ({ ...prev, [name]: "" }));
+    }
+  };
+
+  // Validate form
+  const validateForm = () => {
+    const newErrors = {};
+
+    if (!productData.title.trim()) {
+      newErrors.title = "Product title is required";
+    }
+
+    if (!productData.price || productData.price <= 0) {
+      newErrors.price = "Valid price is required";
+    }
+
+    if (!productData.category) {
+      newErrors.category = "Category is required";
+    }
+
+    if (!productData.description.trim()) {
+      newErrors.description = "Description is required";
+    }
+
+    if (!productData.location.trim()) {
+      newErrors.location = "Location is required";
+    }
+
+    if (!productData.stock || productData.stock < 0) {
+      newErrors.stock = "Valid stock quantity is required";
+    }
+
+    if (imageFiles.length === 0) {
+      newErrors.images = "At least one image is required";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
   };
 
   // Handle multiple file input
@@ -58,15 +101,29 @@ const SellProduct = () => {
     // Update image files state
     setImageFiles(prev => [...prev, ...validFiles]);
 
+    // Clear images error if any
+    if (errors.images) {
+      setErrors(prev => ({ ...prev, images: "" }));
+    }
+
     // Create previews for new files
+    const newPreviews = [];
     validFiles.forEach(file => {
       const reader = new FileReader();
-      reader.onloadend = () => {
-        setImagePreviews(prev => [...prev, {
+      reader.onload = (e) => {
+        newPreviews.push({
           id: Math.random().toString(36).substr(2, 9),
-          url: reader.result,
+          url: e.target.result,
           name: file.name
-        }]);
+        });
+
+        // When all files are processed, update state
+        if (newPreviews.length === validFiles.length) {
+          setImagePreviews(prev => [...prev, ...newPreviews]);
+        }
+      };
+      reader.onerror = () => {
+        toast.error(`❌ Failed to load image: ${file.name}`);
       };
       reader.readAsDataURL(file);
     });
@@ -74,11 +131,11 @@ const SellProduct = () => {
 
   // Remove individual image
   const removeImage = (id) => {
-    const previewIndex = imagePreviews.findIndex(preview => preview.id === id);
-    if (previewIndex !== -1) {
-      setImagePreviews(prev => prev.filter(preview => preview.id !== id));
-      setImageFiles(prev => prev.filter((_, index) => index !== previewIndex));
-    }
+    setImagePreviews(prev => prev.filter(preview => preview.id !== id));
+    setImageFiles(prev => prev.filter((file, index) => {
+      const previewIndex = imagePreviews.findIndex(preview => preview.id === id);
+      return index !== previewIndex;
+    }));
   };
 
   // Clear all images
@@ -91,13 +148,9 @@ const SellProduct = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!productData.title || !productData.price) {
-      alert("Please fill in all required fields");
-      return;
-    }
-
-    if (imageFiles.length === 0) {
-      toast.error("❌ Please upload at least one image");
+    // Validate form before submission
+    if (!validateForm()) {
+      toast.error("❌ Please fill all required fields correctly");
       return;
     }
 
@@ -107,16 +160,17 @@ const SellProduct = () => {
     const formData = new FormData();
 
     // Append all product data
-    formData.append("title", productData.title);
+    formData.append("title", productData.title.trim());
     formData.append("price", productData.price);
     formData.append("category", productData.category);
-    formData.append("description", productData.description);
-    formData.append("location", productData.location);
+    formData.append("description", productData.description.trim());
+    formData.append("location", productData.location.trim());
     formData.append("condition", productData.condition);
+    formData.append("stock", productData.stock);
 
     // Append all image files
-    imageFiles.forEach((file, index) => {
-      formData.append("images", file); // Note: using "images" (plural) to indicate multiple files
+    imageFiles.forEach((file) => {
+      formData.append("images", file);
     });
      
     try {
@@ -136,9 +190,11 @@ const SellProduct = () => {
           description: "",
           location: "",
           condition: "Used",
+          stock: "",
         });
         setImageFiles([]);
         setImagePreviews([]);
+        setErrors({});
         navigate("/userDashboard");
       }, 1000);
     } catch (error) {
@@ -182,9 +238,14 @@ const SellProduct = () => {
                     value={productData.title}
                     onChange={handleChange}
                     placeholder="e.g., iPhone 13 Pro Max"
-                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
+                    className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 ${
+                      errors.title ? "border-red-500" : "border-gray-300"
+                    }`}
                     required
                   />
+                  {errors.title && (
+                    <p className="text-red-500 text-sm mt-1">{errors.title}</p>
+                  )}
                 </div>
 
                 {/* Price */}
@@ -202,10 +263,17 @@ const SellProduct = () => {
                       value={productData.price}
                       onChange={handleChange}
                       placeholder="0.00"
-                      className="w-full px-12 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
+                      min="0"
+                      step="0.01"
+                      className={`w-full px-12 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 ${
+                        errors.price ? "border-red-500" : "border-gray-300"
+                      }`}
                       required
                     />
                   </div>
+                  {errors.price && (
+                    <p className="text-red-500 text-sm mt-1">{errors.price}</p>
+                  )}
                 </div>
               </div>
 
@@ -214,13 +282,16 @@ const SellProduct = () => {
                 {/* Category */}
                 <div className="space-y-2">
                   <label className="block text-sm font-semibold text-gray-700">
-                    Category
+                    Category *
                   </label>
                   <select
                     name="category"
                     value={productData.category}
                     onChange={handleChange}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 appearance-none bg-white"
+                    className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 appearance-none bg-white ${
+                      errors.category ? "border-red-500" : "border-gray-300"
+                    }`}
+                    required
                   >
                     <option value="">Select category</option>
                     <option value="Mobiles">📱 Mobiles</option>
@@ -230,18 +301,22 @@ const SellProduct = () => {
                     <option value="Fashion">👕 Fashion</option>
                     <option value="Property">🏠 Property</option>
                   </select>
+                  {errors.category && (
+                    <p className="text-red-500 text-sm mt-1">{errors.category}</p>
+                  )}
                 </div>
 
                 {/* Condition */}
                 <div className="space-y-2">
                   <label className="block text-sm font-semibold text-gray-700">
-                    Condition
+                    Condition *
                   </label>
                   <select
                     name="condition"
                     value={productData.condition}
                     onChange={handleChange}
                     className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 appearance-none bg-white"
+                    required
                   >
                     <option value="Used">🔄 Used</option>
                     <option value="New">🆕 New</option>
@@ -249,25 +324,56 @@ const SellProduct = () => {
                 </div>
               </div>
 
-              {/* Location */}
-              <div className="space-y-2">
-                <label className="block text-sm font-semibold text-gray-700">
-                  Location
-                </label>
-                <input
-                  type="text"
-                  name="location"
-                  value={productData.location}
-                  onChange={handleChange}
-                  placeholder="e.g., Karachi, Lahore, Islamabad"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
-                />
+              {/* Two Column Layout for Third Row */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Location */}
+                <div className="space-y-2">
+                  <label className="block text-sm font-semibold text-gray-700">
+                    Location *
+                  </label>
+                  <input
+                    type="text"
+                    name="location"
+                    value={productData.location}
+                    onChange={handleChange}
+                    placeholder="e.g., Karachi, Lahore, Islamabad"
+                    className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 ${
+                      errors.location ? "border-red-500" : "border-gray-300"
+                    }`}
+                    required
+                  />
+                  {errors.location && (
+                    <p className="text-red-500 text-sm mt-1">{errors.location}</p>
+                  )}
+                </div>
+
+                {/* Stock */}
+                <div className="space-y-2">
+                  <label className="block text-sm font-semibold text-gray-700">
+                    Stock Quantity *
+                  </label>
+                  <input
+                    type="number"
+                    name="stock"
+                    value={productData.stock}
+                    onChange={handleChange}
+                    placeholder="e.g., 10"
+                    min="0"
+                    className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 ${
+                      errors.stock ? "border-red-500" : "border-gray-300"
+                    }`}
+                    required
+                  />
+                  {errors.stock && (
+                    <p className="text-red-500 text-sm mt-1">{errors.stock}</p>
+                  )}
+                </div>
               </div>
 
               {/* Description */}
               <div className="space-y-2">
                 <label className="block text-sm font-semibold text-gray-700">
-                  Description
+                  Description *
                 </label>
                 <textarea
                   name="description"
@@ -275,23 +381,36 @@ const SellProduct = () => {
                   onChange={handleChange}
                   placeholder="Describe your product in detail..."
                   rows="4"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 resize-none"
+                  className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 resize-none ${
+                    errors.description ? "border-red-500" : "border-gray-300"
+                  }`}
+                  required
                 ></textarea>
+                {errors.description && (
+                  <p className="text-red-500 text-sm mt-1">{errors.description}</p>
+                )}
               </div>
 
               {/* Image Upload */}
               <div className="space-y-2">
                 <div className="flex justify-between items-center">
                   <label className="block text-sm font-semibold text-gray-700">
-                    Product Images
+                    Product Images *
                   </label>
                   <span className="text-sm text-gray-500">
                     {imagePreviews.length}/5 images
                   </span>
                 </div>
 
+                {/* Error message for images */}
+                {errors.images && (
+                  <p className="text-red-500 text-sm mb-2">{errors.images}</p>
+                )}
+
                 {/* Drag & Drop Area */}
-                <div className="border-2 border-dashed border-gray-300 rounded-2xl p-6 text-center transition-all duration-300 hover:border-blue-400 hover:bg-blue-50">
+                <div className={`border-2 border-dashed rounded-2xl p-6 text-center transition-all duration-300 hover:border-blue-400 hover:bg-blue-50 ${
+                  errors.images ? "border-red-500 bg-red-50" : "border-gray-300"
+                }`}>
                   <input
                     type="file"
                     multiple
@@ -354,6 +473,9 @@ const SellProduct = () => {
                             src={preview.url}
                             alt={`Preview ${index + 1}`}
                             className="h-24 w-full object-cover rounded-lg shadow-md border group-hover:opacity-75 transition-opacity"
+                            onError={(e) => {
+                              e.target.src = "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjNmM2YzIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzk5OSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkltYWdlIEVycm9yPC90ZXh0Pjwvc3ZnPg==";
+                            }}
                           />
                           <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all rounded-lg" />
                           <button

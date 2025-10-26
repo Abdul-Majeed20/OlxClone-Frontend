@@ -194,7 +194,7 @@ export const getCartItems = createAsyncThunk(
         credentials: "include",
       });
 
-      if (!response.success) {
+      if (!response.ok) {
         throw new Error(`HTTP error! Status: ${response.status}`);
       }
 
