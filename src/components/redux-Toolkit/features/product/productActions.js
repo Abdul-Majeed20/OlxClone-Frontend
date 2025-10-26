@@ -143,7 +143,7 @@ export const getFavourites = createAsyncThunk(
       });
 
       // Check if response is OK
-      if (!response.success) {
+      if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
