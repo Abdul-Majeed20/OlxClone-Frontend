@@ -143,7 +143,7 @@ export const getFavourites = createAsyncThunk(
       });
 
       // Check if response is OK
-      if (!response.ok) {
+      if (!response.success) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
@@ -194,7 +194,7 @@ export const getCartItems = createAsyncThunk(
         credentials: "include",
       });
 
-      if (!response.ok) {
+      if (!response.success) {
         throw new Error(`HTTP error! Status: ${response.status}`);
       }
 
@@ -230,7 +230,7 @@ export const getMyOrders = createAsyncThunk(
   "getMyOrders",
   async (_, { rejectWithValue }) => {
     try {
-      const response = await fetch(`${BASE_URL}user/myOrders`, {
+      const response = await fetch(`${BASE_URL}/user/myOrders`, {
         credentials: "include",
       });
       if (!response.ok) {
