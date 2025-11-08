@@ -19,9 +19,9 @@ const Toast = ({ message, onClose }) => (
   </div>
 );
 
-const FeaturedProducts = () => {
+const FeaturedProducts = ({allProducts , loading , error}) => {
   const dispatch = useDispatch();
-  const { allProducts, loading, error } = useSelector((state) => state.product);
+  // const { allProducts, loading, error } = useSelector((state) => state.product);
   const [visibleProducts, setVisibleProducts] = useState(8);
   const [showToast, setShowToast] = useState(false);
   const navigate = useNavigate();

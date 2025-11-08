@@ -11,7 +11,8 @@ import {
   getMyOrders,
   updateOrder,
   getAllOrders,
-  getUserProfile
+  getUserProfile,
+  getCategoryItems
 } from "./productActions";
 
 export const productSlice = createSlice({
@@ -177,6 +178,17 @@ export const productSlice = createSlice({
         state.user = action.payload;
       })
       .addCase(getUserProfile.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase(getCategoryItems.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(getCategoryItems.fulfilled, (state, action) => {
+        state.loading = false;
+        state.allProducts = action.payload;
+      })
+      .addCase(getCategoryItems.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })

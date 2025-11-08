@@ -9,7 +9,8 @@ export default function ProtectedRoute({ children, allowedRoles = [] }) {
   const location = useLocation();
 
   const checkUser = async () => {
-      let BASE_URL = "https://olx-clone-backend-new.vercel.app"
+      // let BASE_URL = "https://olx-clone-backend-new.vercel.app"
+           let BASE_URL = "http://localhost:3000"
 
     try {
       console.log("Checking authentication...");

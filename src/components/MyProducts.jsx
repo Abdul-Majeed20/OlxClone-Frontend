@@ -15,12 +15,23 @@ export default function MyProducts() {
 
   useEffect(() => {
     dispatch(getMyProducts());
-  }, [dispatch]);
+  }, [dispatch]); // Added dispatch to dependency array
+
+  // Safe data extraction
+  const products = React.useMemo(() => {
+    if (!myProducts) return [];
+    return myProducts.data || myProducts || [];
+  }, [myProducts]);
 
   // Handle delete function
   const handleDelete = (productId) => {
     // Add your delete logic here
     console.log("Delete product:", productId);
+  };
+
+  // Safe product property access helper
+  const getProductProperty = (product, property, defaultValue = "") => {
+    return product?.[property] ?? defaultValue;
   };
 
   // Loading skeleton component for list view
@@ -103,7 +114,7 @@ export default function MyProducts() {
             </h3>
             <p className="text-red-600 mb-4">{error}</p>
             <button
-              onClick={() => dispatch(getAllProducts())}
+              onClick={() => dispatch(getMyProducts())} // Fixed: should be getMyProducts, not getAllProducts
               className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
             >
               Try Again
@@ -113,8 +124,6 @@ export default function MyProducts() {
       </div>
     );
   }
-
-  const products = myProducts?.data || myProducts || [];
 
   return (
     <div className="animate-fade-in max-w-7xl mx-auto px-2 sm:px-4 lg:px-6 py-6">
@@ -149,35 +158,41 @@ export default function MyProducts() {
                 {/* Product Image & Title - Full width on mobile */}
                 <div className="sm:col-span-5 lg:col-span-4 flex items-center space-x-3 mb-2 sm:mb-0">
                   <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden flex-shrink-0">
-                    {item.images && item.images.length > 0 ? (
+                    {getProductProperty(item, 'images')?.length > 0 ? (
                       <img
                         src={item.images[0]}
-                        alt={item.title}
+                        alt={getProductProperty(item, 'title', 'Product')}
                         className="w-full h-full object-cover"
+                        onError={(e) => {
+                          e.target.style.display = 'none';
+                          e.target.nextSibling.style.display = 'flex';
+                        }}
                       />
-                    ) : (
-                      <div className="text-gray-400">
-                        <svg
-                          className="w-5 h-5"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-                          />
-                        </svg>
-                      </div>
-                    )}
+                    ) : null}
+                    <div 
+                      className="text-gray-400"
+                      style={{ display: getProductProperty(item, 'images')?.length > 0 ? 'none' : 'flex' }}
+                    >
+                      <svg
+                        className="w-5 h-5"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                        />
+                      </svg>
+                    </div>
                   </div>
                   <div className="flex-1 min-w-0">
                     <h3 className="font-semibold text-gray-800 text-sm sm:text-base line-clamp-1">
-                      {item.title}
+                      {getProductProperty(item, 'title', 'Untitled Product')}
                     </h3>
-                    {item.description && (
+                    {getProductProperty(item, 'description') && (
                       <p className="text-xs text-gray-500 line-clamp-1 mt-0.5">
                         {item.description}
                       </p>
@@ -185,16 +200,18 @@ export default function MyProducts() {
                     {/* Mobile only price and stock */}
                     <div className="sm:hidden flex items-center justify-between mt-2">
                       <span className="text-sm font-bold text-blue-600">
-                        ${item.price}
+                        ${getProductProperty(item, 'price', 0)}
                       </span>
                       <span
                         className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-                          item.stock > 0
+                          getProductProperty(item, 'stock', 0) > 0
                             ? "bg-green-100 text-green-800"
                             : "bg-red-100 text-red-800"
                         }`}
                       >
-                        {item.stock > 0 ? `${item.stock} stock` : "Out of stock"}
+                        {getProductProperty(item, 'stock', 0) > 0 
+                          ? `${item.stock} stock` 
+                          : "Out of stock"}
                       </span>
                     </div>
                   </div>
@@ -203,7 +220,7 @@ export default function MyProducts() {
                 {/* Price - Hidden on mobile */}
                 <div className="hidden sm:block sm:col-span-2 text-right">
                   <span className="text-sm sm:text-base font-bold text-blue-600">
-                    ${item.price}
+                    ${getProductProperty(item, 'price', 0)}
                   </span>
                 </div>
 
@@ -211,19 +228,21 @@ export default function MyProducts() {
                 <div className="hidden sm:block sm:col-span-2 text-center">
                   <span
                     className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-                      item.stock > 0
+                      getProductProperty(item, 'stock', 0) > 0
                         ? "bg-green-100 text-green-800"
                         : "bg-red-100 text-red-800"
                     }`}
                   >
-                    {item.stock > 0 ? `${item.stock} in stock` : "Out of stock"}
+                    {getProductProperty(item, 'stock', 0) > 0 
+                      ? `${item.stock} in stock` 
+                      : "Out of stock"}
                   </span>
                 </div>
 
                 {/* Category - Hidden on mobile and tablet */}
                 <div className="hidden lg:block lg:col-span-2">
                   <span className="inline-flex items-center px-2 py-1 bg-blue-100 text-blue-800 text-xs font-medium rounded-full">
-                    {item.category}
+                    {getProductProperty(item, 'category', 'Uncategorized')}
                   </span>
                 </div>
 
@@ -231,7 +250,7 @@ export default function MyProducts() {
                 <div className="sm:col-span-3 lg:col-span-2 flex justify-end sm:justify-end">
                   <div className="flex space-x-1 sm:space-x-2">
                     <button
-                      onClick={() => navigate(`/edit-product/${item._id}`)}
+                      onClick={() => navigate(`/edit-product/${item._id || item.id}`)}
                       className="px-2 py-1 sm:px-3 sm:py-2 bg-green-600 text-white text-xs sm:text-sm font-medium rounded-lg hover:bg-green-700 transition-colors flex items-center space-x-1"
                     >
                       <svg className="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -240,7 +259,7 @@ export default function MyProducts() {
                       <span className="hidden xs:inline">Edit</span>
                     </button>
                     <button
-                      onClick={() => handleDelete(item._id)}
+                      onClick={() => handleDelete(item._id || item.id)}
                       className="px-2 py-1 sm:px-3 sm:py-2 bg-red-600 text-white text-xs sm:text-sm font-medium rounded-lg hover:bg-red-700 transition-colors flex items-center space-x-1"
                     >
                       <svg className="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -254,7 +273,7 @@ export default function MyProducts() {
                 {/* Mobile category - Show below on mobile */}
                 <div className="sm:hidden flex justify-between items-center mt-2">
                   <span className="inline-flex items-center px-2 py-1 bg-blue-100 text-blue-800 text-xs font-medium rounded-full">
-                    {item.category}
+                    {getProductProperty(item, 'category', 'Uncategorized')}
                   </span>
                 </div>
               </div>

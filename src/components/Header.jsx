@@ -28,6 +28,7 @@ import {
   getCurrentUser,
   logoutUser,
 } from "./redux-Toolkit/features/user/userActions";
+import { getCategoryItems } from "./redux-Toolkit/features/product/productActions";
 
 const logo = "/icon.webp";
 
@@ -57,6 +58,11 @@ export default function Header() {
     if (user.role === "admin") navigate("/adminDashboard");
     else navigate("/userDashboard");
   };
+
+  const handleCategory =(cat) => {
+     dispatch(getCategoryItems(cat))
+     navigate(`/category/${cat}`)
+  }
   return (
     <header className="bg-white shadow-sm border-b border-gray-200 w-full">
       {/* Top Header */}
@@ -381,13 +387,12 @@ export default function Header() {
                   >
                     <div className="p-2">
                       {[
-                        "Mobile Phones",
-                        "Cars",
-                        "Motorcycles",
-                        "Houses",
-                        "TV - Video - Audio",
-                        "Tablets",
-                        "Land & Plots",
+                        "Mobiles",
+                        "Electronics",
+                        "vehicles",
+                        "Furniture",
+                        "Fashion",
+                        "Property",
                       ].map((category) => (
                         <a
                           key={category}
@@ -403,21 +408,21 @@ export default function Header() {
 
                 {/* Main Categories */}
                 {[
-                  "Mobile Phones",
-                  "Cars",
-                  "Motorcycles",
-                  "Houses",
-                  "TV - Video - Audio",
-                  "Tablets",
+                  "Mobiles",
+                  "Electronics",
+                  "vehicles",
+                  "Furniture",
+                  "Fashion",
+                  "Property",
                   "Land & Plots",
                 ].map((category) => (
-                  <a
+                  <button
                     key={category}
-                    href="#"
-                    className="text-gray-700 hover:text-blue-500 font-medium text-sm py-2"
+                    onClick={() => handleCategory(category)}
+                    className="text-gray-700 cursor:pointer hover:text-blue-500 font-medium text-sm py-2"
                   >
                     {category}
-                  </a>
+                  </button>
                 ))}
               </PopoverGroup>
             </div>

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { getProductDetails , addToCart } from "../components/redux-Toolkit/features/product/productActions";
 import "../App.css";
 import Header from "../components/Header";
@@ -12,10 +12,10 @@ const Product = () => {
   const { loading, error, productDetails } = useSelector(
     (state) => state.product
   );
-
   const [selectedImage, setSelectedImage] = useState(0);
   const [showPhoneNumber, setShowPhoneNumber] = useState(false);
   const [showCartMessage, setShowCartMessage] = useState(false);
+  const navigate = useNavigate()
 
   useEffect(() => {
     if (id) {
@@ -27,13 +27,39 @@ const Product = () => {
     setShowPhoneNumber(true);
   };
 
-  const handleAddToCart = () => {
-    if (productDetails) {
-      dispatch(addToCart(productDetails._id));
+  const handleAddToCart = async () => {
+  if (!productDetails) return;
+
+  try {
+    // Dispatch the addToCart action and wait for the response
+    const result = await dispatch(addToCart(productDetails._id));
+    console.log("Result is adding cart: ",result)
+    // Check if the action was successful (you might need to adjust this based on your action response)
+    if (result.success) {
       setShowCartMessage(true);
       setTimeout(() => setShowCartMessage(false), 3000);
+    } else {
+      // Handle failure case - user not logged in or other errors
+      handleAddToCartFailure();
     }
-  };
+  } catch (error) {
+    // Handle any unexpected errors
+    handleAddToCartFailure();
+  }
+};
+
+const handleAddToCartFailure = () => {
+  // You can show a different message for failure
+  // For example, show a login prompt or error message
+  // setShowErrorMessage(true);
+  // setTimeout(() => setShowErrorMessage(false), 3000);
+  
+  // Alternatively, you could redirect to login page:
+  navigate('/login');
+  
+  // Or show a modal with login prompt:
+  // setShowLoginModal(true);
+};
 
   if (loading) {
     return (

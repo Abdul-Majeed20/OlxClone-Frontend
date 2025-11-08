@@ -1,6 +1,8 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 
-  let BASE_URL = "https://olx-clone-backend-new.vercel.app"
+  // let BASE_URL = "https://olx-clone-backend-new.vercel.app"
+     let BASE_URL = "http://localhost:3000"
+
 
 export const registerUser = createAsyncThunk(
   "registerUser",

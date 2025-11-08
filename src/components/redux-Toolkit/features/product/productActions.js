@@ -1,7 +1,7 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 
 let BASE_URL = "https://olx-clone-backend-new.vercel.app"
-
+  //  let BASE_URL = "http://localhost:3000"
 export const getMyProducts = createAsyncThunk(
   "getMyProducts",
   async (data, { rejectWithValue }) => {
@@ -296,6 +296,23 @@ export const getUserProfile = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const response = await fetch(`${BASE_URL}/user/profile`, {
+        credentials: "include",
+      });
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+      const result = await response.json();
+      return result.data; // Assuming { data: {...} } format
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+export const getCategoryItems = createAsyncThunk(
+  "getCategoryItems",
+  async (data, { rejectWithValue }) => {
+    try {
+      const response = await fetch(`${BASE_URL}/${data}`, {
         credentials: "include",
       });
       if (!response.ok) {

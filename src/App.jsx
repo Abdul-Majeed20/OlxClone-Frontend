@@ -11,6 +11,7 @@ import Home from "./app/Home";
 import Product from "./app/Product";
 import AdminDashboard from "./app/AdminDashboard";
 import Unauthorized from "./components/Unauthorized";
+import CategoryProducts from "./components/CategoryProducts";
 
 function App() {
   return (
@@ -21,6 +22,7 @@ function App() {
           <Route path="/login" element={<Login />}></Route>
           <Route path="/register" element={<Register />}></Route>
           <Route path="/product/:id" element={<Product />}></Route>
+          <Route path="/category/:category" element={<CategoryProducts/>}></Route>
           <Route
             path="/sellProduct"
             element={

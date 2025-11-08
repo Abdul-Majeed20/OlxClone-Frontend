@@ -70,7 +70,7 @@ const SellProduct = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  // Handle multiple file input
+  // Handle multiple file input 
   const handleImageChange = (e) => {
     const files = Array.from(e.target.files);
     
@@ -162,7 +162,7 @@ const SellProduct = () => {
     // Append all product data
     formData.append("title", productData.title.trim());
     formData.append("price", productData.price);
-    formData.append("category", productData.category);
+    formData.append("category", productData.category.toLocaleLowerCase());
     formData.append("description", productData.description.trim());
     formData.append("location", productData.location.trim());
     formData.append("condition", productData.condition);
